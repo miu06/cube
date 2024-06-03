@@ -1,13 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Cube</title>
-    <link rel="stylesheet" href="cube.css">
+    <title>立方体回転</title>
+    <link rel="stylesheet" type="text/css" href="cube.css">
+    <link rel="stylesheet" type="text/css" href="reset.css">
+    <style>
+        .cube-container {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+    </style>
 </head>
+
 <body>
     <div id="cubeContainer" class="cube-container"></div>
     <script src="cube.js"></script>
 </body>
+
 </html>

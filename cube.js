@@ -38,12 +38,6 @@ const cube = createCube();
 cubeContainer.appendChild(cube);
 
 let startX, startY, currentX = 0, currentY = 0, dragging = false;
-let inertiaX = 0;
-let inertiaY = 0;
-let lastX = 0;
-let lastY = 0;
-let threshold = 0.1;
-let inertia = 0.95; // 慣性の減衰率
 
 // マウスの動きに基づいてキューブを回転させる関数
 function onMouseMove(e) {
@@ -55,8 +49,6 @@ function onMouseMove(e) {
     cube.style.transform = `rotateX(${currentY}deg) rotateY(${currentX}deg)`;
     startX = e.clientX;
     startY = e.clientY;
-    lastX = dx;
-    lastY = dy;
 }
 
 // マウスドラッグ開始
@@ -70,9 +62,6 @@ cubeContainer.addEventListener('mousedown', (e) => {
 document.addEventListener('mouseup', () => {
     dragging = false;
     document.removeEventListener('mousemove', onMouseMove);
-    inertiaX = lastX * inertia;
-    inertiaY = lastY * inertia;
-    requestAnimationFrame(decelerate);
 });
 
 // タッチイベントの処理
@@ -86,8 +75,6 @@ function onTouchMove(e) {
     cube.style.transform = `rotateX(${currentY}deg) rotateY(${currentX}deg)`;
     startX = touch.clientX;
     startY = touch.clientY;
-    lastX = dx;
-    lastY = dy;
     e.preventDefault();
 }
 
@@ -102,21 +89,4 @@ cubeContainer.addEventListener('touchstart', (e) => {
 document.addEventListener('touchend', () => {
     dragging = false;
     document.removeEventListener('touchmove', onTouchMove);
-    inertiaX = lastX * inertia;
-    inertiaY = lastY * inertia;
-    requestAnimationFrame(decelerate);
 });
-
-// 慣性で減速する処理
-function decelerate() {
-    if (!dragging) {
-        currentX += inertiaX;
-        currentY -= inertiaY; // 慣性方向が逆になるので、符号を逆にする
-        cube.style.transform = `rotateX(${currentY}deg) rotateY(${currentX}deg)`;
-        inertiaX *= inertia;
-        inertiaY *= inertia;
-        if (Math.abs(inertiaX) > threshold || Math.abs(inertiaY) > threshold) {
-            requestAnimationFrame(decelerate);
-        }
-    }
-}
