@@ -37,66 +37,56 @@ const cubeContainer = document.getElementById('cubeContainer');
 const cube = createCube();
 cubeContainer.appendChild(cube);
 
-let currentX = 0;
-let currentY = 0;
-let rotating = false;
+let startX, startY, currentX = 0, currentY = 0, dragging = false;
 
 // マウスの動きに基づいてキューブを回転させる関数
 function onMouseMove(e) {
-    if (rotating) return;
-    const rect = cubeContainer.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left - rect.width / 2;
-    const mouseY = e.clientY - rect.top - rect.height / 2;
-    currentX = mouseX / rect.width * 180; // キューブの回転角度を調整
-    currentY = -mouseY / rect.height * 180; // キューブの回転角度を調整
+    if (!dragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    currentX += dx * 0.5;
+    currentY -= dy * 0.5;
     cube.style.transform = `rotateX(${currentY}deg) rotateY(${currentX}deg)`;
+    startX = e.clientX;
+    startY = e.clientY;
 }
 
-// マウスオーバー時に回転を有効にする
-cube.addEventListener('mouseover', () => {
-    rotating = false;
+// マウスドラッグ開始
+cubeContainer.addEventListener('mousedown', (e) => {
+    dragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    document.addEventListener('mousemove', onMouseMove);
 });
 
-// マウスアウト時に回転を無効にする
-cube.addEventListener('mouseout', () => {
-    rotating = true;
+document.addEventListener('mouseup', () => {
+    dragging = false;
+    document.removeEventListener('mousemove', onMouseMove);
 });
 
-// マウスムーブイベントを追加
-cubeContainer.addEventListener('mousemove', onMouseMove);
-
-// タッチイベントの処理はそのまま
-cube.addEventListener('touchstart', touchStart, { passive: false });
-cube.addEventListener('touchmove', touchMove, { passive: false });
-cube.addEventListener('touchend', touchEnd, { passive: false });
-
-function touchStart(e) {
-    rotating = false;
-    dragStart(e.touches[0]);
-}
-
-function touchMove(e) {
-    if (rotating) return;
-    drag(e.touches[0]);
+// タッチイベントの処理
+function onTouchMove(e) {
+    if (!dragging) return;
+    const touch = e.touches[0];
+    const dx = touch.clientX - startX;
+    const dy = touch.clientY - startY;
+    currentX += dx * 0.5;
+    currentY -= dy * 0.5;
+    cube.style.transform = `rotateX(${currentY}deg) rotateY(${currentX}deg)`;
+    startX = touch.clientX;
+    startY = touch.clientY;
     e.preventDefault();
 }
 
-function touchEnd(e) {
-    rotating = true;
-    e.preventDefault();
-}
+cubeContainer.addEventListener('touchstart', (e) => {
+    dragging = true;
+    const touch = e.touches[0];
+    startX = touch.clientX;
+    startY = touch.clientY;
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+});
 
-function dragStart(e) {
-    rotating = true;
-}
-
-function drag(e) {
-    if (rotating) {
-        const rect = cubeContainer.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left - rect.width / 2;
-        const mouseY = e.clientY - rect.top - rect.height / 2;
-        currentX = mouseX / rect.width * 180; // キューブの回転角度を調整
-        currentY = -mouseY / rect.height * 180; // キューブの回転角度を調整
-        cube.style.transform = `rotateX(${currentY}deg) rotateY(${currentX}deg)`;
-    }
-}
+document.addEventListener('touchend', () => {
+    dragging = false;
+    document.removeEventListener('touchmove', onTouchMove);
+});
