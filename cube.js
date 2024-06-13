@@ -37,7 +37,8 @@ const cubeContainer = document.getElementById('cubeContainer');
 const cube = createCube();
 cubeContainer.appendChild(cube);
 
-let startX, startY, currentX = 0, currentY = 0, dragging = false;
+let startX, startY, currentX = 30, currentY = -30; // 初期角度を設定
+let dragging = false;
 let inertiaX = 0;
 let inertiaY = 0;
 let lastX = 0;
@@ -47,7 +48,6 @@ let inertia = 0.95; // 慣性の減衰率
 
 // マウスの動きに基づいてキューブを回転させる関数
 function onMouseMove(e) {
-    if (!dragging) return;
     const dx = e.clientX - startX;
     const dy = e.clientY - startY;
     currentX += dx * 0.5;
@@ -69,6 +69,20 @@ cubeContainer.addEventListener('mousedown', (e) => {
 
 document.addEventListener('mouseup', () => {
     dragging = false;
+    document.removeEventListener('mousemove', onMouseMove);
+    inertiaX = lastX * inertia;
+    inertiaY = lastY * inertia;
+    requestAnimationFrame(decelerate);
+});
+
+// 立方体上でのマウス移動を検出
+cubeContainer.addEventListener('mouseover', (e) => {
+    startX = e.clientX;
+    startY = e.clientY;
+    document.addEventListener('mousemove', onMouseMove);
+});
+
+cubeContainer.addEventListener('mouseout', () => {
     document.removeEventListener('mousemove', onMouseMove);
     inertiaX = lastX * inertia;
     inertiaY = lastY * inertia;
